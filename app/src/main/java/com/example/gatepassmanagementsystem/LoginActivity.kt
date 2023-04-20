@@ -13,8 +13,11 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var binding: ActivityLoginBinding
-
     override fun onCreate(savedInstanceState: Bundle?) {
+        if(Firebase.auth.currentUser != null){
+            this.finish()
+            startActivity(Intent(this, DashboardActivity::class.java))
+        }
         super.onCreate(savedInstanceState)
 
         auth = FirebaseAuth.getInstance()
@@ -31,13 +34,12 @@ class LoginActivity : AppCompatActivity() {
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
-                            Toast.makeText(this, "Successfully Loged in", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "Successfully Logged in", Toast.LENGTH_SHORT).show()
                             startActivity(Intent(this, DashboardActivity::class.java))
                             finish()
-
                         } else {
                             Toast.makeText(this, "Authentication failed", Toast.LENGTH_SHORT).show()
-                            Toast.makeText(this, "You may need to register yourself", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "You need to register", Toast.LENGTH_SHORT).show()
                         }
                     }
             }

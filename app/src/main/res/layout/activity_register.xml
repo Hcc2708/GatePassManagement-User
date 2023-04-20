@@ -2,8 +2,16 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="#121212"
     android:padding="16dp">
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:padding="12dp"
+        android:background="@drawable/rounded"
+        android:backgroundTint="#1a1a1a"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/imageView"
@@ -11,7 +19,7 @@
         android:layout_height="150dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="32dp"
-        android:src="@drawable/ic_logo_background" />
+        android:src="@drawable/userapp" />
 
     <EditText
         android:id="@+id/editEmail"
@@ -19,7 +27,10 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/imageView"
         android:layout_marginTop="48dp"
-        android:background="@drawable/ic_edit_text_rounded_corner"
+        android:background="@drawable/rounded"
+        android:textColor="#fff"
+        android:backgroundTint="#2b2b2b"
+        android:textColorHint="#fff"
         android:hint="Email"
         android:inputType="textEmailAddress"
         android:padding="16dp" />
@@ -30,8 +41,11 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/editEmail"
         android:layout_marginTop="16dp"
-        android:background="@drawable/ic_edit_text_rounded_corner"
+        android:background="@drawable/rounded"
         android:hint="Password"
+        android:backgroundTint="#2b2b2b"
+        android:textColor="#fff"
+        android:textColorHint="#fff"
         android:inputType="textPassword"
         android:padding="16dp" />
 
@@ -41,7 +55,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/editPassword"
         android:layout_marginTop="32dp"
-        android:backgroundTint="#0000ff"
+        android:background="@drawable/rounded"
+        android:backgroundTint="#214194"
         android:text="Register"
         android:textColor="@color/white"
         android:textSize="16sp" />
@@ -54,7 +69,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
         android:text="Already have an account? Login"
-        android:textColor="@color/black"
+        android:textColor="#fff"
         android:textSize="16sp" />
-
+    </RelativeLayout>
 </RelativeLayout>
