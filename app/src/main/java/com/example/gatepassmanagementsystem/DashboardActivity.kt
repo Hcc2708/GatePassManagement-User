@@ -1,21 +1,28 @@
 package com.example.gatepassmanagementsystem
 
-import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.content.SharedPreferences
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Log
+import android.util.Base64
 import android.view.MenuItem
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.appcompat.app.AppCompatActivity
 import com.example.gatepassmanagementsystem.databinding.ActivityDashboardBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.MultiFormatWriter
+import com.google.zxing.WriterException
+import com.journeyapps.barcodescanner.BarcodeEncoder
+import java.io.ByteArrayOutputStream
 
 class DashboardActivity : AppCompatActivity() {
 
@@ -23,22 +30,25 @@ class DashboardActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     lateinit var toggle: ActionBarDrawerToggle
     private lateinit var db: FirebaseFirestore
-
+    private lateinit var sharedPref: SharedPreferences
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityDashboardBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        sharedPref = this.getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
         auth = Firebase.auth
         db = Firebase.firestore
-
         // Set up the toolbar
 //        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         // Set up the navigation drawer
         toggle = ActionBarDrawerToggle(
-            this, binding.drawerLayout, binding.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
+            this,
+            binding.drawerLayout,
+            binding.toolbar,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
         )
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
@@ -48,59 +58,60 @@ class DashboardActivity : AppCompatActivity() {
                     signOut()
                 }
             }
-             true
+            true
         }
+        val currUser = auth.currentUser?.email.toString()
+        db.collection("users").whereEqualTo("user_id", currUser).get()
+            .addOnSuccessListener {
+                val myText = it.documents[0].data?.get("reg_no").toString()
+                binding.tvQr.text = myText
+//Text will be entered here to generate QR code
+                findViewById<TextView>(R.id.tv_user_name).text = myText
+                findViewById<TextView>(R.id.tv_user_email).text = currUser
+                val imageCode: ImageView = findViewById(R.id.qr)
 
-        // Set up the floating action button
-        binding.fab.setOnClickListener {
-            startActivity(Intent(this, RequestGatePassActivity::class.java))
-        }
-
-        // Show the user's name and email
-        auth.currentUser?.let {
-            binding.navView.getHeaderView(0).findViewById<TextView>(R.id.tv_user_name).text = it.displayName
-            binding.navView.getHeaderView(0).findViewById<TextView>(R.id.tv_user_email).text = it.email
-        }
-
-        // Load the user's gate pass requests
-        binding.btn.setOnClickListener{
-        loadGatePassRequests()}
+                val mWriter = MultiFormatWriter()
+                try {
+                    if (sharedPref.contains("qr")) {
+                        with(sharedPref.getString("qr", "DEFAULT")) {
+                            if (this != "DEFAULT") {
+                                val imgBytes = Base64.decode(this, Base64.DEFAULT)
+                                val decodedImg =
+                                    BitmapFactory.decodeByteArray(imgBytes, 0, imgBytes.size)
+                                imageCode.setImageBitmap(decodedImg)
+                            }
+                        }
+                    } else {
+//BitMatrix class to encode entered text and set Width & Height
+                        val mMatrix = mWriter.encode(myText, BarcodeFormat.QR_CODE, 400, 400)
+                        val mEncoder = BarcodeEncoder()
+                        val mBitmap = mEncoder.createBitmap(mMatrix) //creating bitmap of code
+                        imageCode.setImageBitmap(mBitmap)
+                        val baos = ByteArrayOutputStream()
+                        mBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
+                        val encodedImg = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT)
+                        with(sharedPref.edit()) {
+                            putString("qr", encodedImg)
+                            apply()
+                        }
+                    }
+                } catch (e: WriterException) {
+                    e.printStackTrace()
+                }
+            }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if(toggle.onOptionsItemSelected(item)){
-           return true
+        if (toggle.onOptionsItemSelected(item)) {
+            return true
         }
         return super.onOptionsItemSelected(item)
     }
 
     private fun signOut() {
+        sharedPref.edit().remove("qr").apply()
         auth.signOut()
         startActivity(Intent(this, LoginActivity::class.java))
         finish()
     }
-
-    private fun loadGatePassRequests() {
-        val currentUser = auth.currentUser
-        if (currentUser == null) {
-            Log.e(TAG, "User not authenticated")
-            return
-        }
-
-        val requestsCollection = db.collection("gate_pass_requests")
-        val query = requestsCollection.whereEqualTo("user_id", currentUser.email)
-        query.get().addOnSuccessListener { result ->
-            binding.txt3.text = """
-                User Id : ${result.documents.get(0).data?.get("user_id")}
-                Start DateTime : ${result.documents.get(0).data?.get("start_datetime")}
-                End DateTime : ${result.documents.get(0).data?.get("end_datetime")}
-                Status : Approved
-                GateName : Main Gate
-                Created At : ${(result.documents.get(0).data?.get("created_at")).toString().trim()}
-            """.trimIndent()
-        }.addOnFailureListener { e ->
-            Log.e(TAG, "Error getting gate pass requests", e)
-        }
-    }
-
 }
