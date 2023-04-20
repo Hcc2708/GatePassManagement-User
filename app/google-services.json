@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "357236304289",
+    "project_id": "gate-pass-management-sys-46a43",
+    "storage_bucket": "gate-pass-management-sys-46a43.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:357236304289:android:5e9f60df843ce5975d83e0",
+        "android_client_info": {
+          "package_name": "com.example.gatepassmanagementsystem"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "357236304289-cfd80mohc4pfq2h3qk8n3kce10fa20pa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHeoPVYECQQOTXIxpCOdu1kJnDdjoa3aA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "357236304289-cfd80mohc4pfq2h3qk8n3kce10fa20pa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
