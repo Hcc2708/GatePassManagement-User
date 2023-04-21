@@ -31,11 +31,16 @@ class RegisterActivity : AppCompatActivity() {
             binding.progressBar.visibility = View.VISIBLE
             val email = binding.editEmail.text.toString()
             val password = binding.editPassword.text.toString()
-
+            val confirm = binding.editPassword1.text.toString()
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Please enter all fields", Toast.LENGTH_SHORT).show()
                 binding.progressBar.visibility = View.GONE
-            } else {
+            }
+            if(password != confirm){
+                Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                binding.progressBar.visibility = View.GONE
+            }
+            else {
                 var lastreg: Int
                 auth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this) {task ->

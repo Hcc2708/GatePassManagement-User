@@ -56,12 +56,24 @@
         android:textColorHint="#fff"
         android:inputType="textPassword"
         android:padding="16dp" />
-
+    <EditText
+            android:id="@+id/editPassword1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editPassword"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/rounded"
+            android:hint="Confirm Password"
+            android:backgroundTint="#2b2b2b"
+            android:textColor="#fff"
+            android:textColorHint="#fff"
+            android:inputType="textPassword"
+            android:padding="16dp" />
     <Button
         android:id="@+id/buttonRegister"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/editPassword"
+        android:layout_below="@id/editPassword1"
         android:layout_marginTop="32dp"
         android:background="@drawable/rounded"
         android:backgroundTint="#214194"
