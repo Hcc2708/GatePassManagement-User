@@ -19,6 +19,15 @@
             app:title="@string/app_name" />
         <!--We are using this image
         view to display our QR code-->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center|bottom"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:layout_below="@id/toolbar"
+            android:visibility="visible" />
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

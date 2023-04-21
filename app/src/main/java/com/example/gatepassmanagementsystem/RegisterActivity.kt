@@ -1,9 +1,11 @@
 package com.example.gatepassmanagementsystem
 import android.content.ContentValues.TAG
 import android.content.Intent
+import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import com.example.gatepassmanagementsystem.databinding.ActivityRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -26,6 +28,7 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(binding.root)
         db = Firebase.firestore
         binding.buttonRegister.setOnClickListener {
+            binding.progressBar.visibility = View.VISIBLE
             val email = binding.editEmail.text.toString()
             val password = binding.editPassword.text.toString()
 
@@ -54,6 +57,7 @@ class RegisterActivity : AppCompatActivity() {
                                         .addOnSuccessListener {
                                             Toast.makeText(this, "Registration successful", Toast.LENGTH_SHORT).show()
 //                            startActivity(Intent(this, DashboardActivity::class.java))
+                                            binding.progressBar.visibility = View.GONE
                                             finish()
                                         }
                                 }
@@ -62,7 +66,8 @@ class RegisterActivity : AppCompatActivity() {
                                 }
 
                         } else {
-                            Toast.makeText(this, "Account Exists", Toast.LENGTH_SHORT).show()
+                            binding.progressBar.visibility = View.GONE
+                            Toast.makeText(this, "Account Exists... Please Login", Toast.LENGTH_SHORT).show()
                         }
                     }
             }
