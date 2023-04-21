@@ -8,10 +8,12 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Base64
 import android.view.MenuItem
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.startActivity
 import com.example.gatepassmanagementsystem.databinding.ActivityDashboardBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -61,44 +63,48 @@ class DashboardActivity : AppCompatActivity() {
             true
         }
         val currUser = auth.currentUser?.email.toString()
-        db.collection("users").whereEqualTo("user_id", currUser).get()
-            .addOnSuccessListener {
-                val myText = it.documents[0].data?.get("reg_no").toString()
-                binding.tvQr.text = myText
-//Text will be entered here to generate QR code
-                findViewById<TextView>(R.id.tv_user_name).text = myText
-                findViewById<TextView>(R.id.tv_user_email).text = currUser
-                val imageCode: ImageView = findViewById(R.id.qr)
-
-                val mWriter = MultiFormatWriter()
-                try {
-                    if (sharedPref.contains("qr")) {
-                        with(sharedPref.getString("qr", "DEFAULT")) {
-                            if (this != "DEFAULT") {
-                                val imgBytes = Base64.decode(this, Base64.DEFAULT)
-                                val decodedImg =
-                                    BitmapFactory.decodeByteArray(imgBytes, 0, imgBytes.size)
-                                imageCode.setImageBitmap(decodedImg)
-                            }
-                        }
-                    } else {
-//BitMatrix class to encode entered text and set Width & Height
-                        val mMatrix = mWriter.encode(myText, BarcodeFormat.QR_CODE, 400, 400)
-                        val mEncoder = BarcodeEncoder()
-                        val mBitmap = mEncoder.createBitmap(mMatrix) //creating bitmap of code
-                        imageCode.setImageBitmap(mBitmap)
-                        val baos = ByteArrayOutputStream()
-                        mBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
-                        val encodedImg = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT)
-                        with(sharedPref.edit()) {
-                            putString("qr", encodedImg)
-                            apply()
-                        }
-                    }
-                } catch (e: WriterException) {
-                    e.printStackTrace()
+        val imageCode: ImageView = findViewById(R.id.qr)
+        if (sharedPref.contains("qr")) {
+            with(sharedPref.getString("qr", "DEFAULT")) {
+                if (this != "DEFAULT") {
+                    val imgBytes = Base64.decode(this, Base64.DEFAULT)
+                    val decodedImg =
+                        BitmapFactory.decodeByteArray(imgBytes, 0, imgBytes.size)
+                    imageCode.setImageBitmap(decodedImg)
+                    binding.progressBar.visibility= View.GONE
                 }
             }
+        }else {
+            db.collection("users").whereEqualTo("user_id", currUser).get()
+                .addOnSuccessListener {
+                    val myText = it.documents[0].data?.get("reg_no").toString()
+                    binding.tvQr.text = myText
+//Text will be entered here to generate QR code
+                    findViewById<TextView>(R.id.tv_user_name).text = myText
+                    findViewById<TextView>(R.id.tv_user_email).text = currUser
+
+
+                    val mWriter = MultiFormatWriter()
+                    try {
+//BitMatrix class to encode entered text and set Width & Height
+                            val mMatrix = mWriter.encode(myText, BarcodeFormat.QR_CODE, 400, 400)
+                            val mEncoder = BarcodeEncoder()
+                            val mBitmap = mEncoder.createBitmap(mMatrix) //creating bitmap of code
+                            imageCode.setImageBitmap(mBitmap)
+                        binding.progressBar.visibility = View.GONE
+                            val baos = ByteArrayOutputStream()
+                            mBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
+                            val encodedImg =
+                                Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT)
+                            with(sharedPref.edit()) {
+                                putString("qr", encodedImg)
+                                apply()
+                            }
+                    } catch (e: WriterException) {
+                        e.printStackTrace()
+                    }
+                }
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
