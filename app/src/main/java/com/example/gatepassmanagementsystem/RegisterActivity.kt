@@ -34,6 +34,7 @@ class RegisterActivity : AppCompatActivity() {
 
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Please enter all fields", Toast.LENGTH_SHORT).show()
+                binding.progressBar.visibility = View.GONE
             } else {
                 var lastreg: Int
                 auth.createUserWithEmailAndPassword(email, password)
@@ -63,6 +64,7 @@ class RegisterActivity : AppCompatActivity() {
                                 }
                                 .addOnFailureListener { exception ->
                                     Log.d(TAG, "get failed with ", exception)
+                                    binding.progressBar.visibility = View.GONE
                                 }
 
                         } else {
